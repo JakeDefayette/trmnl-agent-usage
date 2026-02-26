@@ -1,0 +1,120 @@
+<div class="layout layout--col gap--space-between">
+
+  <!-- Header -->
+  <div class="columns columns--2">
+    <div class="column">
+      <span class="title title--small">Agent Usage</span>
+    </div>
+    <div class="column text--right">
+      <span class="label label--small">{{ updated_at }}</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Provider columns -->
+  <div class="grid grid--cols-3">
+
+    <!-- Claude -->
+    <div class="grid__item">
+      <div class="layout layout--col gap--small">
+        <span class="title title--small">Claude</span>
+        {% if claude.available %}
+          <span class="label">{{ claude.primary_label }}</span>
+          <div class="progress-bar">
+            <div class="track">
+              <div class="fill" style="width: {{ claude.primary_fill_pct }}"></div>
+            </div>
+          </div>
+          <span class="label label--small">{{ claude.primary_pct }}% used</span>
+          <span class="label label--small">{{ claude.primary_resets }}</span>
+
+          <div class="divider divider--thin"></div>
+
+          <span class="label">{{ claude.secondary_label }}</span>
+          <div class="progress-bar">
+            <div class="track">
+              <div class="fill" style="width: {{ claude.secondary_fill_pct }}"></div>
+            </div>
+          </div>
+          <span class="label label--small">{{ claude.secondary_pct }}% used</span>
+          <span class="label label--small">{{ claude.secondary_resets }}</span>
+
+          {% if claude.extra_spend != "" %}
+            <div class="divider divider--thin"></div>
+            <span class="label label--small">Spend: {{ claude.extra_spend }}</span>
+          {% endif %}
+        {% else %}
+          <span class="label label--small">{{ claude.error }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Codex -->
+    <div class="grid__item">
+      <div class="layout layout--col gap--small">
+        <span class="title title--small">Codex</span>
+        {% if codex.available %}
+          <span class="label">{{ codex.primary_label }}</span>
+          <div class="progress-bar">
+            <div class="track">
+              <div class="fill" style="width: {{ codex.primary_fill_pct }}"></div>
+            </div>
+          </div>
+          <span class="label label--small">{{ codex.primary_pct }}% used</span>
+          <span class="label label--small">{{ codex.primary_resets }}</span>
+
+          <div class="divider divider--thin"></div>
+
+          <span class="label">{{ codex.secondary_label }}</span>
+          <div class="progress-bar">
+            <div class="track">
+              <div class="fill" style="width: {{ codex.secondary_fill_pct }}"></div>
+            </div>
+          </div>
+          <span class="label label--small">{{ codex.secondary_pct }}% used</span>
+          <span class="label label--small">{{ codex.secondary_resets }}</span>
+
+          {% if codex.extra_spend != "" %}
+            <div class="divider divider--thin"></div>
+            <span class="label label--small">Credits: {{ codex.extra_spend }}</span>
+          {% endif %}
+        {% else %}
+          <span class="label label--small">{{ codex.error }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Gemini -->
+    <div class="grid__item">
+      <div class="layout layout--col gap--small">
+        <span class="title title--small">Gemini</span>
+        {% if gemini.available %}
+          <span class="label">{{ gemini.primary_label }}</span>
+          <div class="progress-bar">
+            <div class="track">
+              <div class="fill" style="width: {{ gemini.primary_fill_pct }}"></div>
+            </div>
+          </div>
+          <span class="label label--small">{{ gemini.primary_pct }}% used</span>
+          <span class="label label--small">{{ gemini.primary_resets }}</span>
+
+          <div class="divider divider--thin"></div>
+
+          <span class="label">{{ gemini.secondary_label }}</span>
+          <div class="progress-bar">
+            <div class="track">
+              <div class="fill" style="width: {{ gemini.secondary_fill_pct }}"></div>
+            </div>
+          </div>
+          <span class="label label--small">{{ gemini.secondary_pct }}% used</span>
+          <span class="label label--small">{{ gemini.secondary_resets }}</span>
+        {% else %}
+          <span class="label label--small">{{ gemini.error }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+</div>

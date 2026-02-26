@@ -1,0 +1,12 @@
+{
+  "name": "trmnl-agent-usage",
+  "version": "1.0.0",
+  "description": "TRMNL e-ink dashboard for coding agent usage (Claude Code, OpenAI Codex, Gemini CLI)",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.9"
+  }
+}
