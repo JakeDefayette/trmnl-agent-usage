@@ -26,6 +26,7 @@ interface CodexUsageResponse {
   plan_type?: string;
   rate_limit?: {
     primary_window?: RateWindow;
+    secondary_window?: RateWindow;
   };
   additional_rate_limits?: Array<{
     limit_name?: string;
@@ -112,7 +113,8 @@ export function parseCodexUsage(
       ?? parseExpiry(usage.rate_limit_reset_credits?.expires_at),
   };
 
-  const primary = usage.rate_limit?.primary_window;
+  const primary = usage.rate_limit?.secondary_window
+    ?? usage.rate_limit?.primary_window;
   if (primary) {
     data.primaryLabel = windowLabel(primary.limit_window_seconds);
     data.primaryPercent = primary.used_percent ?? 0;

@@ -48,6 +48,27 @@ describe("parseClaudeUsage", () => {
 });
 
 describe("parseCodexUsage", () => {
+  test("prefers the weekly secondary window over a session primary window", () => {
+    const data = parseCodexUsage({
+      rate_limit: {
+        primary_window: {
+          used_percent: 12,
+          limit_window_seconds: 18_000,
+          reset_at: 1_785_929_255,
+        },
+        secondary_window: {
+          used_percent: 21,
+          limit_window_seconds: 604_800,
+          reset_at: 1_785_974_869,
+        },
+      },
+    });
+
+    expect(data.primaryLabel).toBe("Weekly");
+    expect(data.primaryPercent).toBe(21);
+    expect(data.primaryResetsAt?.getTime()).toBe(1_785_974_869_000);
+  });
+
   test("uses weekly labels, includes Spark, and exposes the reset bank", () => {
     const data = parseCodexUsage(
       {
