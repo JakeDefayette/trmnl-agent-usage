@@ -1,120 +1,297 @@
-<div class="layout layout--col gap--space-between">
+<style>
+  .agent-headroom {
+    height: 100%;
+    color: #111;
+  }
 
-  <!-- Header -->
-  <div class="columns columns--2">
-    <div class="column">
-      <span class="title title--small">Agent Usage</span>
-    </div>
-    <div class="column text--right">
-      <span class="label label--small">{{ updated_at }}</span>
-    </div>
+  .agent-headroom__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 4px solid #111;
+    padding-bottom: 5px;
+    margin-bottom: 9px;
+  }
+
+  .agent-headroom__title {
+    font-size: 34px;
+    line-height: 0.95;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+  }
+
+  .agent-headroom__updated {
+    color: #444;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .agent-headroom__providers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    height: 358px;
+  }
+
+  .agent-headroom__provider {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 3px solid #111;
+  }
+
+  .agent-headroom__provider-name {
+    padding: 8px 12px 4px;
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .agent-headroom__body {
+    flex: 1;
+    min-height: 0;
+    padding: 0 12px 8px;
+  }
+
+  .agent-headroom__window {
+    border-bottom: 2px solid #111;
+    padding: 6px 0 8px;
+  }
+
+  .agent-headroom__window:last-child {
+    border-bottom: 0;
+  }
+
+  .agent-headroom__window-top {
+    display: grid;
+    grid-template-columns: 74px 1fr auto;
+    align-items: baseline;
+    gap: 7px;
+    margin-bottom: 5px;
+  }
+
+  .agent-headroom__window-name {
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .agent-headroom__percent {
+    font-size: 28px;
+    line-height: 0.9;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .agent-headroom__used {
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .agent-headroom__reset {
+    color: #444;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .agent-headroom__track {
+    height: 15px;
+    border: 2px solid #111;
+    background: #fff;
+  }
+
+  .agent-headroom__fill {
+    height: 100%;
+    background: #111;
+  }
+
+  .agent-headroom__reset-bank {
+    display: grid;
+    grid-template-columns: 1fr 118px;
+    align-items: stretch;
+    border: 3px solid #111;
+    margin-top: 10px;
+  }
+
+  .agent-headroom__reset-bank-label {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-right: 2px solid #111;
+    font-size: 28px;
+    line-height: 0.88;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .agent-headroom__reset-bank-value {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 7px 5px;
+    text-align: center;
+  }
+
+  .agent-headroom__reset-bank-count {
+    font-size: 42px;
+    line-height: 0.85;
+    font-weight: 900;
+  }
+
+  .agent-headroom__reset-bank-detail {
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 900;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .agent-headroom__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    border-top: 2px solid #111;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .agent-headroom__footer-value {
+    white-space: nowrap;
+  }
+
+  .agent-headroom__error {
+    display: flex;
+    align-items: center;
+    min-height: 210px;
+    color: #444;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+</style>
+
+<div class="agent-headroom">
+  <div class="agent-headroom__header">
+    <div class="agent-headroom__title">Agent Headroom</div>
+    <div class="agent-headroom__updated">Updated {{ updated_at }}</div>
   </div>
 
-  <div class="divider"></div>
+  <div class="agent-headroom__providers">
+    <div class="agent-headroom__provider">
+      <div class="agent-headroom__provider-name">Claude</div>
 
-  <!-- Provider columns -->
-  <div class="grid grid--cols-3">
-
-    <!-- Claude -->
-    <div class="grid__item">
-      <div class="layout layout--col gap--small">
-        <span class="title title--small">Claude</span>
-        {% if claude.available %}
-          <span class="label">{{ claude.primary_label }}</span>
-          <div class="progress-bar">
-            <div class="track">
-              <div class="fill" style="width: {{ claude.primary_fill_pct }}"></div>
+      {% if claude.available %}
+        <div class="agent-headroom__body">
+          <div class="agent-headroom__window">
+            <div class="agent-headroom__window-top">
+              <div class="agent-headroom__window-name">{{ claude.primary_label }}</div>
+              <div><span class="agent-headroom__percent">{{ claude.primary_pct }}%</span> <span class="agent-headroom__used">used</span></div>
+              <div class="agent-headroom__reset">Reset {{ claude.primary_resets }}</div>
+            </div>
+            <div class="agent-headroom__track">
+              <div class="agent-headroom__fill" style="width: {{ claude.primary_fill_pct }}"></div>
             </div>
           </div>
-          <span class="label label--small">{{ claude.primary_pct }}% used</span>
-          <span class="label label--small">{{ claude.primary_resets }}</span>
 
-          <div class="divider divider--thin"></div>
-
-          <span class="label">{{ claude.secondary_label }}</span>
-          <div class="progress-bar">
-            <div class="track">
-              <div class="fill" style="width: {{ claude.secondary_fill_pct }}"></div>
+          <div class="agent-headroom__window">
+            <div class="agent-headroom__window-top">
+              <div class="agent-headroom__window-name">{{ claude.secondary_label }}</div>
+              <div><span class="agent-headroom__percent">{{ claude.secondary_pct }}%</span> <span class="agent-headroom__used">used</span></div>
+              <div class="agent-headroom__reset">Reset {{ claude.secondary_resets }}</div>
+            </div>
+            <div class="agent-headroom__track">
+              <div class="agent-headroom__fill" style="width: {{ claude.secondary_fill_pct }}"></div>
             </div>
           </div>
-          <span class="label label--small">{{ claude.secondary_pct }}% used</span>
-          <span class="label label--small">{{ claude.secondary_resets }}</span>
 
-          {% if claude.extra_spend != "" %}
-            <div class="divider divider--thin"></div>
-            <span class="label label--small">Spend: {{ claude.extra_spend }}</span>
+          {% if claude.tertiary_label != blank %}
+            <div class="agent-headroom__window">
+              <div class="agent-headroom__window-top">
+                <div class="agent-headroom__window-name">{{ claude.tertiary_label }}</div>
+                <div><span class="agent-headroom__percent">{{ claude.tertiary_pct }}%</span> <span class="agent-headroom__used">used</span></div>
+                <div class="agent-headroom__reset">Reset {{ claude.tertiary_resets }}</div>
+              </div>
+              <div class="agent-headroom__track">
+                <div class="agent-headroom__fill" style="width: {{ claude.tertiary_fill_pct }}"></div>
+              </div>
+            </div>
           {% endif %}
-        {% else %}
-          <span class="label label--small">{{ claude.error }}</span>
-        {% endif %}
-      </div>
+        </div>
+
+        <div class="agent-headroom__footer">
+          <span>Extra usage</span>
+          <span class="agent-headroom__footer-value">{% if claude.extra_usage_status != blank %}{{ claude.extra_usage_status }}{% else %}--{% endif %}</span>
+        </div>
+      {% else %}
+        <div class="agent-headroom__body">
+          <div class="agent-headroom__error">{{ claude.error }}</div>
+        </div>
+      {% endif %}
     </div>
 
-    <!-- Codex -->
-    <div class="grid__item">
-      <div class="layout layout--col gap--small">
-        <span class="title title--small">Codex</span>
-        {% if codex.available %}
-          <span class="label">{{ codex.primary_label }}</span>
-          <div class="progress-bar">
-            <div class="track">
-              <div class="fill" style="width: {{ codex.primary_fill_pct }}"></div>
+    <div class="agent-headroom__provider">
+      <div class="agent-headroom__provider-name">Codex</div>
+
+      {% if codex.available %}
+        <div class="agent-headroom__body">
+          <div class="agent-headroom__window">
+            <div class="agent-headroom__window-top">
+              <div class="agent-headroom__window-name">{{ codex.primary_label }}</div>
+              <div><span class="agent-headroom__percent">{{ codex.primary_pct }}%</span> <span class="agent-headroom__used">used</span></div>
+              <div class="agent-headroom__reset">Reset {{ codex.primary_resets }}</div>
+            </div>
+            <div class="agent-headroom__track">
+              <div class="agent-headroom__fill" style="width: {{ codex.primary_fill_pct }}"></div>
             </div>
           </div>
-          <span class="label label--small">{{ codex.primary_pct }}% used</span>
-          <span class="label label--small">{{ codex.primary_resets }}</span>
 
-          <div class="divider divider--thin"></div>
-
-          <span class="label">{{ codex.secondary_label }}</span>
-          <div class="progress-bar">
-            <div class="track">
-              <div class="fill" style="width: {{ codex.secondary_fill_pct }}"></div>
+          {% if codex.secondary_label != blank %}
+            <div class="agent-headroom__window">
+              <div class="agent-headroom__window-top">
+                <div class="agent-headroom__window-name">{{ codex.secondary_label }}</div>
+                <div><span class="agent-headroom__percent">{{ codex.secondary_pct }}%</span> <span class="agent-headroom__used">used</span></div>
+                <div class="agent-headroom__reset">Reset {{ codex.secondary_resets }}</div>
+              </div>
+              <div class="agent-headroom__track">
+                <div class="agent-headroom__fill" style="width: {{ codex.secondary_fill_pct }}"></div>
+              </div>
             </div>
-          </div>
-          <span class="label label--small">{{ codex.secondary_pct }}% used</span>
-          <span class="label label--small">{{ codex.secondary_resets }}</span>
-
-          {% if codex.extra_spend != "" %}
-            <div class="divider divider--thin"></div>
-            <span class="label label--small">Credits: {{ codex.extra_spend }}</span>
           {% endif %}
-        {% else %}
-          <span class="label label--small">{{ codex.error }}</span>
-        {% endif %}
-      </div>
-    </div>
 
-    <!-- Gemini -->
-    <div class="grid__item">
-      <div class="layout layout--col gap--small">
-        <span class="title title--small">Gemini</span>
-        {% if gemini.available %}
-          <span class="label">{{ gemini.primary_label }}</span>
-          <div class="progress-bar">
-            <div class="track">
-              <div class="fill" style="width: {{ gemini.primary_fill_pct }}"></div>
+          <div class="agent-headroom__reset-bank">
+            <div class="agent-headroom__reset-bank-label">Reset<br>bank</div>
+            <div class="agent-headroom__reset-bank-value">
+              <div class="agent-headroom__reset-bank-count">{{ codex.reset_credits_available }}</div>
+              <div class="agent-headroom__reset-bank-detail">
+                {{ codex.reset_credits_applicable }} usable now<br>
+                {% if codex.reset_credits_expires != blank %}Use by {{ codex.reset_credits_expires }}{% else %}Use within 30d{% endif %}
+              </div>
             </div>
           </div>
-          <span class="label label--small">{{ gemini.primary_pct }}% used</span>
-          <span class="label label--small">{{ gemini.primary_resets }}</span>
+        </div>
 
-          <div class="divider divider--thin"></div>
-
-          <span class="label">{{ gemini.secondary_label }}</span>
-          <div class="progress-bar">
-            <div class="track">
-              <div class="fill" style="width: {{ gemini.secondary_fill_pct }}"></div>
-            </div>
-          </div>
-          <span class="label label--small">{{ gemini.secondary_pct }}% used</span>
-          <span class="label label--small">{{ gemini.secondary_resets }}</span>
-        {% else %}
-          <span class="label label--small">{{ gemini.error }}</span>
-        {% endif %}
-      </div>
+        <div class="agent-headroom__footer">
+          <span>Plan</span>
+          <span class="agent-headroom__footer-value">{% if codex.plan_label != blank %}{{ codex.plan_label }}{% else %}--{% endif %}</span>
+        </div>
+      {% else %}
+        <div class="agent-headroom__body">
+          <div class="agent-headroom__error">{{ codex.error }}</div>
+        </div>
+      {% endif %}
     </div>
-
   </div>
-
 </div>
