@@ -24,17 +24,23 @@ interface UsageWindow {
 
 interface ExtraUsage {
   is_enabled?: boolean;
-  monthly_limit?: number;
-  used_credits?: number;
-  utilization?: number;
-  currency?: string;
 }
 
 interface ClaudeUsageResponse {
   five_hour?: UsageWindow;
   seven_day?: UsageWindow;
   extra_usage?: ExtraUsage;
-  [key: string]: unknown;
+  limits?: Array<{
+    kind?: string;
+    group?: string;
+    percent?: number;
+    resets_at?: string;
+    scope?: {
+      model?: {
+        display_name?: string;
+      };
+    } | null;
+  }>;
 }
 
 async function getAccessToken(): Promise<string | null> {
@@ -72,6 +78,48 @@ async function getAccessToken(): Promise<string | null> {
   return null;
 }
 
+export function parseClaudeUsage(usage: ClaudeUsageResponse): ProviderData {
+  const data: ProviderData = {
+    name: "claude",
+    status: "ok",
+    primaryLabel: "Session",
+    secondaryLabel: "Weekly",
+  };
+
+  if (typeof usage.extra_usage?.is_enabled === "boolean") {
+    data.extraUsageEnabled = usage.extra_usage.is_enabled;
+  }
+
+  if (usage.five_hour) {
+    data.primaryPercent = Math.min(100, Math.round(usage.five_hour.utilization ?? 0));
+    if (usage.five_hour.resets_at) {
+      data.primaryResetsAt = new Date(usage.five_hour.resets_at);
+    }
+  }
+
+  if (usage.seven_day) {
+    data.secondaryPercent = Math.min(100, Math.round(usage.seven_day.utilization ?? 0));
+    if (usage.seven_day.resets_at) {
+      data.secondaryResetsAt = new Date(usage.seven_day.resets_at);
+    }
+  }
+
+  const fable = usage.limits?.find((limit) =>
+    limit.kind === "weekly_scoped"
+    && limit.scope?.model?.display_name?.toLowerCase() === "fable"
+  );
+
+  if (fable) {
+    data.tertiaryLabel = "Fable";
+    data.tertiaryPercent = Math.min(100, Math.round(fable.percent ?? 0));
+    if (fable.resets_at) {
+      data.tertiaryResetsAt = new Date(fable.resets_at);
+    }
+  }
+
+  return data;
+}
+
 export const claude: ProviderFetcher = {
   name: "claude",
 
@@ -92,37 +140,7 @@ export const claude: ProviderFetcher = {
         timeoutMs: 30_000,
       });
 
-      const data: ProviderData = {
-        name: "claude",
-        status: "ok",
-        primaryLabel: "5h window",
-        secondaryLabel: "7d window",
-      };
-
-      if (usage.five_hour) {
-        // utilization is 0-100, not 0-1
-        data.primaryPercent = Math.min(100, Math.round(usage.five_hour.utilization ?? 0));
-        if (usage.five_hour.resets_at) {
-          data.primaryResetsAt = new Date(usage.five_hour.resets_at);
-        }
-      }
-
-      if (usage.seven_day) {
-        data.secondaryPercent = Math.min(100, Math.round(usage.seven_day.utilization ?? 0));
-        if (usage.seven_day.resets_at) {
-          data.secondaryResetsAt = new Date(usage.seven_day.resets_at);
-        }
-      }
-
-      if (usage.extra_usage?.is_enabled && usage.extra_usage.used_credits != null) {
-        // used_credits and monthly_limit are in cents
-        data.extraSpend = usage.extra_usage.used_credits / 100;
-        data.extraLimit = usage.extra_usage.monthly_limit != null
-          ? usage.extra_usage.monthly_limit / 100
-          : undefined;
-      }
-
-      return data;
+      return parseClaudeUsage(usage);
     } catch (err) {
       return { name: "claude", status: "error", error: String(err) };
     }

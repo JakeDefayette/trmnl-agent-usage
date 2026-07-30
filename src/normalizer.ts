@@ -1,47 +1,51 @@
 import type { ProviderData, FlatProviderVars } from "./types.js";
 
-function formatResetTime(date?: Date): string {
+function formatReset(date?: Date): string {
   if (!date) return "";
   const now = new Date();
-  const diffMs = date.getTime() - now.getTime();
+  const isToday = date.toDateString() === now.toDateString();
+  const time = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 
-  if (diffMs <= 0) return "Resetting now";
+  if (isToday) return time;
 
-  const diffMin = Math.floor(diffMs / 60_000);
-  if (diffMin < 60) return `Resets in ${diffMin}m`;
-
-  const diffHours = Math.floor(diffMin / 60);
-  const remainMin = diffMin % 60;
-  if (diffHours < 24) {
-    return remainMin > 0 ? `Resets in ${diffHours}h ${remainMin}m` : `Resets in ${diffHours}h`;
-  }
-
-  // Format as date
-  return `Resets ${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+  const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+  return `${weekday} ${time}`;
 }
 
-function formatSpend(amount?: number, limit?: number): string {
-  if (amount == null) return "";
-  const spent = `$${amount.toFixed(2)}`;
-  if (limit != null) return `${spent} / $${limit.toFixed(2)}`;
-  return spent;
+function formatExpiry(date?: Date): string {
+  if (!date) return "";
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function formatPercent(percent?: number): number {
+  return Math.max(0, Math.min(100, Math.round(percent ?? 0)));
 }
 
 export function flatten(data: ProviderData): FlatProviderVars {
   const isAvailable = data.status === "ok";
+  const primaryPercent = formatPercent(data.primaryPercent);
+  const secondaryPercent = formatPercent(data.secondaryPercent);
+  const tertiaryPercent = formatPercent(data.tertiaryPercent);
 
   return {
     available: isAvailable,
-    status: data.status,
     error: data.error ?? "",
-    primary_pct: data.primaryPercent ?? 0,
-    primary_fill_pct: `${data.primaryPercent ?? 0}%`,
+    primary_pct: primaryPercent,
+    primary_fill_pct: `${primaryPercent}%`,
     primary_label: data.primaryLabel ?? "",
-    primary_resets: formatResetTime(data.primaryResetsAt),
-    secondary_pct: data.secondaryPercent ?? 0,
-    secondary_fill_pct: `${data.secondaryPercent ?? 0}%`,
+    primary_resets: formatReset(data.primaryResetsAt),
+    secondary_pct: secondaryPercent,
+    secondary_fill_pct: `${secondaryPercent}%`,
     secondary_label: data.secondaryLabel ?? "",
-    secondary_resets: formatResetTime(data.secondaryResetsAt),
-    extra_spend: formatSpend(data.extraSpend, data.extraLimit),
+    secondary_resets: formatReset(data.secondaryResetsAt),
+    tertiary_pct: tertiaryPercent,
+    tertiary_fill_pct: `${tertiaryPercent}%`,
+    tertiary_label: data.tertiaryLabel ?? "",
+    tertiary_resets: formatReset(data.tertiaryResetsAt),
+    extra_usage_status: data.extraUsageEnabled == null ? "" : data.extraUsageEnabled ? "On" : "Off",
+    plan_label: data.planLabel ?? "",
+    reset_credits_available: data.resetCreditsAvailable ?? 0,
+    reset_credits_applicable: data.resetCreditsApplicable ?? 0,
+    reset_credits_expires: formatExpiry(data.resetCreditsExpiresAt),
   };
 }

@@ -2,15 +2,14 @@
 
 Show your coding agent usage and rate limits on a [TRMNL](https://usetrmnl.com) e-ink display.
 
-Fetches usage data from **Claude Code**, **OpenAI Codex**, and **Gemini CLI**, then pushes it to a TRMNL private plugin webhook for rendering on the 800x480 e-ink screen.
+Fetches usage data from **Claude Code** and **OpenAI Codex**, then pushes it to a TRMNL private plugin webhook for rendering on the 800x480 e-ink screen.
 
 ![TRMNL Display](https://github.com/user-attachments/assets/placeholder.png)
 
 ## Features
 
-- **Claude Code** — Session (5h) and weekly (7d) rate limits, extra usage spend
-- **OpenAI Codex** — Primary and secondary rate limit windows, credit balance
-- **Gemini CLI** — Pro and Flash model quota usage
+- **Claude Code** — Session, weekly, separate Fable usage, and extra-usage status
+- **OpenAI Codex** — Weekly and Spark usage, banked resets, and plan context
 - **Zero npm dependencies** — uses Bun built-ins only
 - **Auto-refresh** via macOS launchd (every 8 minutes)
 
@@ -18,7 +17,7 @@ Fetches usage data from **Claude Code**, **OpenAI Codex**, and **Gemini CLI**, t
 
 - [Bun](https://bun.sh) runtime
 - A [TRMNL](https://usetrmnl.com) device
-- At least one of: Claude Code, OpenAI Codex, or Gemini CLI installed and authenticated
+- At least one of: Claude Code or OpenAI Codex installed and authenticated
 
 ## Setup
 
@@ -42,7 +41,6 @@ Edit `.env`:
 
 ```
 TRMNL_WEBHOOK_UUID=your-uuid-here
-TRMNL_API_KEY=your-api-key-here
 ```
 
 ### 3. Run
@@ -82,7 +80,6 @@ launchctl unload ~/Library/LaunchAgents/com.trmnl.agent-usage.plist
 |---|---|---|
 | Claude Code | `~/.claude/.credentials.json` (or macOS keychain) | `GET /api/oauth/usage` |
 | OpenAI Codex | `~/.codex/auth.json` | `GET /backend-api/wham/usage` |
-| Gemini CLI | `~/.gemini/oauth_creds.json` + OAuth client from CLI binary | `POST /v1internal:retrieveUserQuota` |
 
 Providers that aren't installed or authenticated are gracefully skipped and shown as unavailable on the display.
 
@@ -91,9 +88,6 @@ Providers that aren't installed or authenticated are gracefully skipped and show
 | Variable | Required | Description |
 |---|---|---|
 | `TRMNL_WEBHOOK_UUID` | Yes | From TRMNL private plugin settings |
-| `TRMNL_API_KEY` | Yes | From TRMNL account settings |
-| `GEMINI_OAUTH_CLIENT_ID` | No | Fallback if CLI binary extraction fails |
-| `GEMINI_OAUTH_CLIENT_SECRET` | No | Fallback if CLI binary extraction fails |
 
 ## Project Structure
 
@@ -108,11 +102,9 @@ src/
 ├── providers/
 │   ├── base.ts           # ProviderFetcher interface
 │   ├── claude.ts         # Claude Code provider
-│   ├── codex.ts          # OpenAI Codex provider
-│   └── gemini.ts         # Gemini CLI provider
+│   └── codex.ts          # OpenAI Codex provider
 └── lib/
     ├── http.ts           # fetch with timeout
-    ├── jwt.ts            # JWT decoder
     └── keychain.ts       # macOS keychain reader
 template/
 └── plugin.html           # TRMNL Liquid template

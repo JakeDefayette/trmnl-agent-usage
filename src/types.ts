@@ -10,13 +10,18 @@ export interface ProviderData {
   secondaryPercent?: number;
   secondaryLabel?: string;
   secondaryResetsAt?: Date;
-  extraSpend?: number;
-  extraLimit?: number;
+  tertiaryPercent?: number;
+  tertiaryLabel?: string;
+  tertiaryResetsAt?: Date;
+  extraUsageEnabled?: boolean;
+  planLabel?: string;
+  resetCreditsAvailable?: number;
+  resetCreditsApplicable?: number;
+  resetCreditsExpiresAt?: Date;
 }
 
 export interface FlatProviderVars {
   available: boolean;
-  status: string;
   error: string;
   primary_pct: number;
   primary_fill_pct: string;
@@ -26,12 +31,19 @@ export interface FlatProviderVars {
   secondary_fill_pct: string;
   secondary_label: string;
   secondary_resets: string;
-  extra_spend: string;
+  tertiary_pct: number;
+  tertiary_fill_pct: string;
+  tertiary_label: string;
+  tertiary_resets: string;
+  extra_usage_status: string;
+  plan_label: string;
+  reset_credits_available: number;
+  reset_credits_applicable: number;
+  reset_credits_expires: string;
 }
 
 export interface TrmnlPayload {
   claude: FlatProviderVars;
   codex: FlatProviderVars;
-  gemini: FlatProviderVars;
   updated_at: string;
 }
